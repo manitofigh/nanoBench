@@ -169,7 +169,7 @@ def getNCBoxUnits():
             getNCBoxUnits.nCBoxUnits = int(cbo_config) - 1
          log.debug('Number of CBox Units: ' + str(getNCBoxUnits.nCBoxUnits))
       except subprocess.CalledProcessError as e:
-         log.critical('Error: ' + e.output)
+         log.criticalge.output)
          sys.exit()
       except OSError as e:
          log.critical("rdmsr not found. Try 'sudo apt install msr-tools'")
