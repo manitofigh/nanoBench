@@ -148,7 +148,9 @@ def getCacheInfo(level):
             nSets = cpuidInfo['nSets']
 
             stride = 2**((lineSize*nSets//getNCBoxUnits())-1).bit_length() # smallest power of two larger than lineSize*nSets/nCBoxUnits
+            print("** Before MaximalNonEvicting **")
             ms = findMaximalNonEvictingL3SetInCBox(0, stride, assoc, 0)
+            print("** After MaximalNonEvicting **")
             log.debug('Maximal non-evicting L3 set: ' + str(len(ms)) + ' ' + str(ms))
             nCboxes = getNCBoxUnits()
             nSlices = nCboxes * int(math.ceil(float(len(ms))/assoc))
@@ -187,11 +189,15 @@ def getCBoxOfAddress(address):
    cBoxMap = getCBoxOfAddress.cBoxMap
 
    if not address in cBoxMap:
+      print("** Before setNanoBenchParameters **")
       setNanoBenchParameters(config='', msrConfig=getDefaultCacheMSRConfig(), nMeasurements=10, unrollCount=1, loopCount=10, aggregateFunction='min',
                              basicMode=True, noMem=True)
 
+      print("** Before getCodeForAddressLists **")
       ec = getCodeForAddressLists([AddressList([address], False, True, False)])
+      print("** Before runNanoBench **")
       nb = runNanoBench(code=ec.code, oneTimeInit=ec.oneTimeInit)
+      print("** After runNanoBench **")
 
       nCacheLookups = [nb['CACHE_LOOKUP_CBO_'+str(cBox)] for cBox in range(0, getNCBoxUnits())]
       cBoxMap[address] = nCacheLookups.index(max(nCacheLookups))
@@ -604,10 +610,12 @@ def findMaximalNonEvictingL3SetInCBox(start, stride, L3Assoc, cBox):
 
    curAddress = start
    while len(clearHLAddresses) < 2*(getCacheInfo(1).assoc+getCacheInfo(2).assoc):
+      print(f"Iteration {len(clearHLAddresses)}")
       if getCBoxOfAddress(curAddress) != cBox:
          clearHLAddresses.append(curAddress)
       curAddress += stride
    clearHLAddrList = AddressList(clearHLAddresses, True, False, False)
+   print("After L1/L2")
 
    curAddress = start
    while len(addresses) < L3Assoc:
@@ -616,6 +624,7 @@ def findMaximalNonEvictingL3SetInCBox(start, stride, L3Assoc, cBox):
       curAddress += stride
 
    notAdded = 0
+   print(" ** Before searching non-evicting set A+B **")
    while notAdded < L3Assoc:
       curAddress += stride
 

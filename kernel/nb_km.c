@@ -991,6 +991,7 @@ static int run_nanoBench_cycle_by_cycle(struct seq_file *m, void *v) {
 }
 
 static int open_nanoBench(struct inode *inode, struct file *file) {
+    printk(KERN_INFO "\n** Entry open_nanoBench **\n");
     return single_open_size(file, run_nanoBench, NULL, (n_pfc_configs + n_msr_configs + 4*use_fixed_counters) * 128);
 }
 
