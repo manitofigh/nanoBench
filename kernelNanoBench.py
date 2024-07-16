@@ -74,6 +74,7 @@ def getR14Size():
    if not hasattr(getR14Size, 'r14Size'):
       with open('/sys/nb/r14_size') as f:
          line = f.readline()
+         print(f"LINE: {line}")
          mb = int(line.split()[2])
          getR14Size.r14Size = mb * 1024 * 1024
    return getR14Size.r14Size
