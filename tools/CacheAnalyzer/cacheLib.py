@@ -104,6 +104,7 @@ def getArch():
    if not hasattr(getArch, 'arch'):
       cpu = cpuid.CPUID()
       getArch.arch = cpuid.micro_arch(cpu)
+      print(f"ARCHITECTURE: {getArch.arch}")
    return getArch.arch
 
 def getCPUVendor():
@@ -160,16 +161,19 @@ def getCacheInfo(level):
 
 def getNCBoxUnits():
    if not hasattr(getNCBoxUnits, 'nCBoxUnits'):
+      print(getArch())
       try:
-         subprocess.check_output(['modprobe', 'msr'])
-         cbo_config = subprocess.check_output(['rdmsr', '0x396', '-f', '3:0'])
+         # subprocess.check_output(['modprobe', 'msr'])
+         # cbo_config = subprocess.check_output(['rdmsr', '0x396', '-f', '3:0'])
+         # cbo_config = "20"
          if getArch() in ['CNL', 'ICL', 'TGL', 'ADL-P']:
             getNCBoxUnits.nCBoxUnits = int(cbo_config)
          else:
-            getNCBoxUnits.nCBoxUnits = int(cbo_config) - 1
+            # getNCBoxUnits.nCBoxUnits = int(cbo_config) - 1
+            getNCBoxUnits.nCBoxUnits = 19
          log.debug('Number of CBox Units: ' + str(getNCBoxUnits.nCBoxUnits))
       except subprocess.CalledProcessError as e:
-         log.criticalge.output)
+         log.criticalge.output
          sys.exit()
       except OSError as e:
          log.critical("rdmsr not found. Try 'sudo apt install msr-tools'")
