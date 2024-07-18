@@ -16,7 +16,7 @@ def writeFile(fileName, content):
 
 def readFile(fileName):
    with open(fileName) as f:
-      print("Done opening")
+      print("** Done opening **")
       return f.read()
 
 
@@ -238,6 +238,7 @@ def _getNanoBenchOutput(procFile, code, codeObjFile, codeBinFile,
       if cpu is None:
          print("** Before readFile(procFile) in kernelNanoBench.py **")
          output = readFile(procFile)
+         print("** Done reading readFile(...) in kernelNanoBench.py **")
       else:
          print("** Before subprocess.check_output in kernelNanoBench.py **")
          output = subprocess.check_output(['taskset', '-c', str(cpu), 'cat', procFile]).decode()

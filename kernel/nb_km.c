@@ -20,6 +20,7 @@
 #include <linux/seq_file.h>
 #include <linux/version.h>
 #include <linux/vmalloc.h>
+#include <linux/kernel.h>
 #include <../arch/x86/include/asm/fpu/api.h>
 
 #if LINUX_VERSION_CODE <= KERNEL_VERSION(4,12,0)

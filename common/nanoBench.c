@@ -512,6 +512,7 @@ size_t configure_perf_ctrs_programmable(size_t next_pfc_config, bool usr, bool o
 
 void configure_MSRs(struct msr_config config) {
     for (size_t i=0; i<config.n_wrmsr; i++) {
+        printk(KERN_INFO "** wrmsr: %lu wrmsr_val: %lu\n", config.wrmsr[i], config.wrmsr_val[i]);
         write_msr(config.wrmsr[i], config.wrmsr_val[i]);
     }
     cur_rdmsr = config.rdmsr;
