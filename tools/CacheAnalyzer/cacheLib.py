@@ -60,6 +60,12 @@ def getDefaultCacheMSRConfig():
          MSR_UNC_CBO_0_PERFEVTSEL0 = 0x700
          MSR_UNC_CBO_0_PERFCTR0 = 0x702
          dist = 8
+      elif getArch() in ['SKX']:
+         print("** ENTERING SKX CASE MSRCONFIG **")
+         MSR_UNC_PERF_GLOBAL_CTRL = 0x700
+         MSR_UNC_CBO_0_PERFEVTSEL0 = 0x0E01
+         MSR_UNC_CBO_0_PERFCTR0 = 0x0E08
+         dist = 16
       else:
          MSR_UNC_PERF_GLOBAL_CTRL = 0xE01
          MSR_UNC_CBO_0_PERFEVTSEL0 = 0x700
