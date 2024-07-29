@@ -886,7 +886,6 @@ void print_all_measurement_results(int64_t* results[], int n_counters) {
         sprintf(buf, "\trun %*d: ", run_padding, i);
         for (int c=0; c<n_counters; c++) {
             sprintf(buf + strlen(buf), "%12lld", (long long)results[c][i]);
-            snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%12lld", (long long)results[c][i]);
         }
         print_verbose("%s\n", buf);
     }
