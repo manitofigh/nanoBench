@@ -63,20 +63,45 @@ def getDefaultCacheMSRConfig():
       elif getArch() in ['SKX']:
          print("** ENTERING SKX CASE MSRCONFIG **")
          MSR_UNC_PERF_GLOBAL_CTRL = 0x700
-         MSR_UNC_CBO_0_PERFEVTSEL0 = 0x0E01
+         MSR_UNC_CBO_0_PERFEVTSEL0 = 0x0E02
          MSR_UNC_CBO_0_PERFCTR0 = 0x0E08
-         dist = 16
       else:
          MSR_UNC_PERF_GLOBAL_CTRL = 0xE01
          MSR_UNC_CBO_0_PERFEVTSEL0 = 0x700
          MSR_UNC_CBO_0_PERFCTR0 = 0x706
          dist = 16
 
-      return '\n'.join('msr_' + format(MSR_UNC_PERF_GLOBAL_CTRL, '#x') + '=0x20000000' +
-                       '.msr_' + format(MSR_UNC_CBO_0_PERFEVTSEL0 + dist*cbo, '#x') + '=0x408F34' +
-                       ' msr_' + format(MSR_UNC_CBO_0_PERFCTR0 + dist*cbo, '#x') +
-                       ' CACHE_LOOKUP_CBO_' + str(cbo)
-                       for cbo in range(0, getNCBoxUnits()))
+      ret = '''
+msr_0x700=0x20000000.msr_0x0E21=0x408F34 msr_0x0E28 CACHE_LOOKUP_CBO_0
+msr_0x700=0x20000000.msr_0x0E31=0x408F34 msr_0x0E38 CACHE_LOOKUP_CBO_1
+msr_0x700=0x20000000.msr_0x0E41=0x408F34 msr_0x0E48 CACHE_LOOKUP_CBO_2
+msr_0x700=0x20000000.msr_0x0E51=0x408F34 msr_0x0E58 CACHE_LOOKUP_CBO_3
+msr_0x700=0x20000000.msr_0x0E61=0x408F34 msr_0x0E68 CACHE_LOOKUP_CBO_4
+msr_0x700=0x20000000.msr_0x0E81=0x408F34 msr_0x0E88 CACHE_LOOKUP_CBO_5
+msr_0x700=0x20000000.msr_0x0E91=0x408F34 msr_0x0E98 CACHE_LOOKUP_CBO_6
+msr_0x700=0x20000000.msr_0x0EA1=0x408F34 msr_0x0EA8 CACHE_LOOKUP_CBO_7
+msr_0x700=0x20000000.msr_0x0EB1=0x408F34 msr_0x0EB8 CACHE_LOOKUP_CBO_8
+msr_0x700=0x20000000.msr_0x0EC1=0x408F34 msr_0x0EC8 CACHE_LOOKUP_CBO_9
+msr_0x700=0x20000000.msr_0x0EE1=0x408F34 msr_0x0EE8 CACHE_LOOKUP_CBO_10
+msr_0x700=0x20000000.msr_0x0EF1=0x408F34 msr_0x0EF8 CACHE_LOOKUP_CBO_11
+msr_0x700=0x20000000.msr_0x0F01=0x408F34 msr_0x0F08 CACHE_LOOKUP_CBO_12
+msr_0x700=0x20000000.msr_0x0F21=0x408F34 msr_0x0F28 CACHE_LOOKUP_CBO_13
+msr_0x700=0x20000000.msr_0x0F31=0x408F34 msr_0x0F38 CACHE_LOOKUP_CBO_14
+msr_0x700=0x20000000.msr_0x0F51=0x408F34 msr_0x0F58 CACHE_LOOKUP_CBO_15
+msr_0x700=0x20000000.msr_0x0F61=0x408F34 msr_0x0F68 CACHE_LOOKUP_CBO_16
+msr_0x700=0x20000000.msr_0x0F91=0x408F34 msr_0x0F98 CACHE_LOOKUP_CBO_17
+msr_0x700=0x20000000.msr_0x0FA1=0x408F34 msr_0x0FA8 CACHE_LOOKUP_CBO_18
+msr_0x700=0x20000000.msr_0x0FB1=0x408F34 msr_0x0FB8 CACHE_LOOKUP_CBO_19
+'''
+
+      print (ret)
+
+      return ret
+      # return '\n'.join('msr_' + format(MSR_UNC_PERF_GLOBAL_CTRL, '#x') + '=0x20000000' +
+      #                  '.msr_' + format(MSR_UNC_CBO_0_PERFEVTSEL0 + dist*cbo, '#x') + '=0x408F34' +
+      #                  ' msr_' + format(MSR_UNC_CBO_0_PERFCTR0 + dist*cbo, '#x') +
+      #                  ' CACHE_LOOKUP_CBO_' + str(cbo)
+      #                  for cbo in range(0, getNCBoxUnits()))
    return ''
 
 
@@ -178,7 +203,7 @@ def getNCBoxUnits():
             getNCBoxUnits.nCBoxUnits = int(cbo_config)
          else:
             # getNCBoxUnits.nCBoxUnits = int(cbo_config) - 1
-            getNCBoxUnits.nCBoxUnits = 19
+            getNCBoxUnits.nCBoxUnits = 20
          log.debug('Number of CBox Units: ' + str(getNCBoxUnits.nCBoxUnits))
       except subprocess.CalledProcessError as e:
          log.criticalge.output
@@ -187,7 +212,6 @@ def getNCBoxUnits():
          log.critical("rdmsr not found. Try 'sudo apt install msr-tools'")
          sys.exit()
    return getNCBoxUnits.nCBoxUnits
-
 
 def getCBoxOfAddress(address):
    if not hasattr(getCBoxOfAddress, 'cBoxMap'):
@@ -201,11 +225,15 @@ def getCBoxOfAddress(address):
 
       print("** Before getCodeForAddressLists **")
       ec = getCodeForAddressLists([AddressList([address], False, True, False)])
+      print(f"** ec: {ec}")
       print("** Before runNanoBench **")
       nb = runNanoBench(code=ec.code, oneTimeInit=ec.oneTimeInit)
+      print(f"** nb: {nb}**")
       print("** After runNanoBench **")
 
       nCacheLookups = [nb['CACHE_LOOKUP_CBO_'+str(cBox)] for cBox in range(0, getNCBoxUnits())]
+      print(f"** nCacheLookups: {nCacheLookups} **")
+      print(f"** NCBoxUnits: {str(getNCBoxUnits.nCBoxUnits)} **")
       cBoxMap[address] = nCacheLookups.index(max(nCacheLookups))
 
    return cBoxMap[address]
@@ -519,7 +547,7 @@ def runCacheExperimentCode(code, initCode, oneTimeInitCode, loop, warmUpCount, c
 # doNotUseOtherCBoxes determines whether accesses to clear higher levels will go to other CBoxes
 # if wbinvd is set, wbinvd will be called before initSeq
 def runCacheExperiment(level, seq, initSeq='', cacheSets=None, cBox=1, cSlice=0, clearHL=True, doNotUseOtherCBoxes=False, loop=1, wbinvd=False,
-                       nMeasurements=10, warmUpCount=1, codeSet=None, agg='avg', nClearAddresses=None):
+                       nMeasurements=4, warmUpCount=1, codeSet=None, agg='avg', nClearAddresses=None):
    cacheSetList = parseCacheSetsStr(level, clearHL, cacheSets, doNotUseOtherCBoxes)
    ec = getCodeForCacheExperiment(level, seq, initSeq=initSeq, cacheSetList=cacheSetList, cBox=cBox, cSlice=cSlice, clearHL=clearHL,
                                   doNotUseOtherCBoxes=doNotUseOtherCBoxes, wbinvd=wbinvd, nClearAddresses=nClearAddresses)
@@ -614,11 +642,19 @@ def findMaximalNonEvictingL3SetInCBox(start, stride, L3Assoc, cBox):
    clearHLAddresses = []
    addresses = []
 
+   # experimental
+   cBox = 2
+
    curAddress = start
    while len(clearHLAddresses) < 2*(getCacheInfo(1).assoc+getCacheInfo(2).assoc):
-      print(f"Iteration {len(clearHLAddresses)}")
+      print(f"** two time ... = {2*(getCacheInfo(1).assoc+getCacheInfo(2).assoc)}")
+      print(f"** Iteration {len(clearHLAddresses)} **")
+      print(f"** ClearHLAddresses arr: {clearHLAddresses} **")
+      print(f"** CBox of currAddress: {getCBoxOfAddress(curAddress)} **")
       if getCBoxOfAddress(curAddress) != cBox:
+         print(f"appending address: {curAddress}")
          clearHLAddresses.append(curAddress)
+      print(f"CBox of curr addr {curAddress} != cBox: {cBox}")
       curAddress += stride
    clearHLAddrList = AddressList(clearHLAddresses, True, False, False)
    print("After L1/L2")
@@ -628,6 +664,7 @@ def findMaximalNonEvictingL3SetInCBox(start, stride, L3Assoc, cBox):
       if getCBoxOfAddress(curAddress) == cBox:
          addresses.append(curAddress)
       curAddress += stride
+
 
    notAdded = 0
    print(" ** Before searching non-evicting set A+B **")

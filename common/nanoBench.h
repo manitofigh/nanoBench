@@ -143,7 +143,8 @@ extern int output_range;
 #define OUTPUT_RANGE_DEFAULT false;
 
 extern int verbose;
-#define VERBOSE_DEFAULT false;
+// #define VERBOSE_DEFAULT false;
+#define VERBOSE_DEFAULT true;
 
 // Whether to generate a breakpoint trap after executing the code to be benchmarked.
 extern int debug;

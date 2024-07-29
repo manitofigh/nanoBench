@@ -875,7 +875,7 @@ void print_all_measurement_results(int64_t* results[], int n_counters) {
     int run_padding = (n_measurements<=10?1:(n_measurements<=100?2:(n_measurements<=1000?3:4)));
 
     char buf[120];
-
+    
     sprintf(buf, "\t%*s      ", run_padding, "");
     for (int c=0; c<n_counters; c++) {
         sprintf(buf + strlen(buf), "        Ctr%d", c);
@@ -886,6 +886,7 @@ void print_all_measurement_results(int64_t* results[], int n_counters) {
         sprintf(buf, "\trun %*d: ", run_padding, i);
         for (int c=0; c<n_counters; c++) {
             sprintf(buf + strlen(buf), "%12lld", (long long)results[c][i]);
+            snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%12lld", (long long)results[c][i]);
         }
         print_verbose("%s\n", buf);
     }
