@@ -196,8 +196,6 @@ def getNCHAUnits():
     pciId = subprocess.check_output("lspci | grep ':1e.3' | head -n 1 | cut -d' ' -f1", shell=True).decode().strip()
     hexValue = subprocess.check_output(f"sudo setpci -s {pciId} 0x9c.l", shell=True).decode().strip()
     binaryValue = bin(int(hexValue, 16))[2:].zfill(32)
-    # for i in range 250:
-    #    print(f"NUM CHAs: {binaryValue.count('1')}\n")
     return binaryValue.count('1')
 
 def getNCBoxUnits():
