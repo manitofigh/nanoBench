@@ -191,19 +191,29 @@ def getCacheInfo(level):
    else:
       raise ValueError('invalid level')
 
+# In SKX, the CBo functionality is a part of what CHA (Cache/Home Agent) provides
+def getNCHAUnits():
+    pciId = subprocess.check_output("lspci | grep ':1e.3' | head -n 1 | cut -d' ' -f1", shell=True).decode().strip()
+    hexValue = subprocess.check_output(f"sudo setpci -s {pciId} 0x9c.l", shell=True).decode().strip()
+    binaryValue = bin(int(hexValue, 16))[2:].zfill(32)
+    # for i in range 250:
+    #    print(f"NUM CHAs: {binaryValue.count('1')}\n")
+    return binaryValue.count('1')
 
 def getNCBoxUnits():
    if not hasattr(getNCBoxUnits, 'nCBoxUnits'):
-      print(getArch())
       try:
-         # subprocess.check_output(['modprobe', 'msr'])
-         # cbo_config = subprocess.check_output(['rdmsr', '0x396', '-f', '3:0'])
-         # cbo_config = "20"
+         if getArch() in ['SKX']:
+            getNCBoxUnits.nCBoxUnits = getNCHAUnits()
+            print(f"DYNAMIC CBO COUNT: {getNCBoxUnits.nCBoxUnits}")
+            return getNCBoxUnits.nCBoxUnits
+         subprocess.check_output(['modprobe', 'msr'])
+         cbo_config = subprocess.check_output(['rdmsr', '0x396', '-f', '3:0'])
+         cbo_config = "20"
          if getArch() in ['CNL', 'ICL', 'TGL', 'ADL-P']:
             getNCBoxUnits.nCBoxUnits = int(cbo_config)
          else:
-            # getNCBoxUnits.nCBoxUnits = int(cbo_config) - 1
-            getNCBoxUnits.nCBoxUnits = 20
+            getNCBoxUnits.nCBoxUnits = int(cbo_config) - 1
          log.debug('Number of CBox Units: ' + str(getNCBoxUnits.nCBoxUnits))
       except subprocess.CalledProcessError as e:
          log.criticalge.output
