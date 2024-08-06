@@ -10,6 +10,7 @@
 // You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 #include "nanoBench.h"
+// #include <stdio.h>
 
 long n_measurements = N_MEASUREMENTS_DEFAULT;
 long unroll_count = UNROLL_COUNT_DEFAULT;
@@ -875,10 +876,11 @@ void print_all_measurement_results(int64_t* results[], int n_counters) {
     int run_padding = (n_measurements<=10?1:(n_measurements<=100?2:(n_measurements<=1000?3:4)));
 
     char buf[120];
-    
+
     sprintf(buf, "\t%*s      ", run_padding, "");
     for (int c=0; c<n_counters; c++) {
         sprintf(buf + strlen(buf), "        Ctr%d", c);
+        sprintf(buf + strlen(buf), "  Evt  Umask  Cmask  MSR_3F6H  MSR_PF  MSR_RSP0  MSR_RSP1  Description\n");
     }
     print_verbose("%s\n", buf);
 
@@ -886,6 +888,15 @@ void print_all_measurement_results(int64_t* results[], int n_counters) {
         sprintf(buf, "\trun %*d: ", run_padding, i);
         for (int c=0; c<n_counters; c++) {
             sprintf(buf + strlen(buf), "%12lld", (long long)results[c][i]);
+            sprintf(buf + strlen(buf), "  %4lx  %5lx  %5lx  %8lx  %6lx  %8lx  %8lx  %s\n",
+                pfc_configs[c].evt_num,
+                pfc_configs[c].umask,
+                pfc_configs[c].cmask,
+                pfc_configs[c].msr_3f6h,
+                pfc_configs[c].msr_pf,
+                pfc_configs[c].msr_rsp0,
+                pfc_configs[c].msr_rsp1,
+                pfc_configs[c].description);
         }
         print_verbose("%s\n", buf);
     }
