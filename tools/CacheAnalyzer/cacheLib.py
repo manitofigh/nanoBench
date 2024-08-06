@@ -221,6 +221,9 @@ def getNCBoxUnits():
          sys.exit()
    return getNCBoxUnits.nCBoxUnits
 
+# def getCHAOfAddress(address):
+# return
+
 def getCBoxOfAddress(address):
    if not hasattr(getCBoxOfAddress, 'cBoxMap'):
       getCBoxOfAddress.cBoxMap = dict()
